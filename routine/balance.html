@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Suivi Balance - Objectif 80kg Musclé & Sec</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0d0d0d;
+      color: white;
+      padding: 15px;
+      margin: 0;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 1.5em;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: auto;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    @media (min-width: 450px) {
+      .grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .card {
+      background: #1b1b1b;
+      border-radius: 12px;
+      padding: 12px;
+      box-shadow: 0px 0px 8px rgba(255,255,255,0.05);
+    }
+
+    label {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 13px;
+      opacity: 0.8;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+      background: #2a2a2a;
+      color: white;
+      font-size: 15px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      background: #00ff88;
+      font-size: 15px;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background: #00cc6d;
+    }
+
+    .danger {
+      background: #ff3b3b;
+      margin-top: 10px;
+    }
+
+    .danger:hover {
+      background: #d92c2c;
+    }
+
+    .charts {
+      margin-top: 25px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    canvas {
+      background: #1b1b1b;
+      border-radius: 12px;
+      padding: 12px;
+      width: 100% !important;
+      height: 250px !important;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: #1b1b1b;
+      font-size: 12px;
+    }
+
+    th, td {
+      padding: 6px;
+      text-align: center;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    th {
+      background: #111;
+    }
+
+    .progressBox {
+      margin-top: 15px;
+      text-align: center;
+      font-size: 18px;
+      padding: 12px;
+      border-radius: 12px;
+      background: #1b1b1b;
+    }
+
+    .progressBox span {
+      color: #00ff88;
+      font-weight: bold;
+    }
+
+    .infoBox {
+      margin-top: 12px;
+      text-align: center;
+      font-size: 13px;
+      opacity: 0.85;
+      padding: 10px;
+      border-radius: 12px;
+      background: #141414;
+      line-height: 1.5;
+    }
+
+    .infoBox b {
+      color: #00ff88;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>📊 Suivi Balance - Objectif 80kg Musclé & Sec</h1>
+
+    <div class="infoBox">
+      Objectif final : <b>80 kg</b> et <b>12%</b> de graisse <br>
+      Objectif masse maigre (Lean Mass) : <b id="objectifLeanMass">--</b> kg
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <label>Poids (kg)</label>
+        <input type="number" id="poids" step="0.1">
+      </div>
+
+      <div class="card">
+        <label>Graisse corporelle (%)</label>
+        <input type="number" id="graisse" step="0.1">
+      </div>
+
+      <div class="card">
+        <label>Graisse sous-cutanée (%)</label>
+        <input type="number" id="souscutanee" step="0.1">
+      </div>
+
+      <div class="card">
+        <label>Graisse viscérale</label>
+        <input type="number" id="viscerale" step="1">
+      </div>
+
+      <div class="card">
+        <label>Eau corporelle (%)</label>
+        <input type="number" id="eau" step="0.1">
+      </div>
+
+      <div class="card">
+        <label>Masse musculaire (%)</label>
+        <input type="number" id="muscle" step="0.1">
+      </div>
+
+      <div class="card">
+        <label>Masse osseuse (kg)</label>
+        <input type="number" id="os" step="0.1">
+      </div>
+
+      <div class="card">
+        <label>Métabolisme de base (kcal)</label>
+        <input type="number" id="bmr" step="1">
+      </div>
+    </div>
+
+    <button onclick="saveData()">💾 Enregistrer</button>
+    <button class="danger" onclick="resetData()">🗑️ Supprimer l'historique</button>
+
+    <div class="progressBox">
+      🎯 Score pour mon objectif : <span id="progressGlobal">0%</span>
+    </div>
+
+    <div class="infoBox" id="detailsBox">
+      Lean Mass actuelle : <b>--</b> kg / Objectif : <b>--</b> kg <br>
+      Graisse actuelle : <b>--</b>% / Objectif : <b>12</b>% <br>
+      Graisse viscérale : <b>--</b> / Objectif : <b>8</b>
+    </div>
+
+    <div class="charts">
+      <canvas id="globalChart"></canvas>
+      <canvas id="statsChart"></canvas>
+    </div>
+
+    <h2 style="margin-top:25px;">📌 Historique des entrées</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Poids</th>
+          <th>Graisse</th>
+          <th>Sous-cutanée</th>
+          <th>Viscérale</th>
+          <th>Eau</th>
+          <th>Muscle</th>
+          <th>Lean Mass</th>
+          <th>Score %</th>
+        </tr>
+      </thead>
+      <tbody id="historyTable"></tbody>
+    </table>
+  </div>
+
+  <script>
+    // OBJECTIFS
+    const objectifs = {
+      poids: 80,
+      graisse: 12,
+      souscutanee: 10,
+      viscerale: 8,
+      eau: 60,
+      muscle: 50
+    };
+
+    const objectifLeanMass = objectifs.poids * (1 - objectifs.graisse / 100);
+
+    const weights = {
+      leanMass: 0.50,
+      graisse: 0.25,
+      viscerale: 0.10,
+      souscutanee: 0.07,
+      eau: 0.05,
+      muscle: 0.03
+    };
+
+    let globalChart;
+    let statsChart;
+
+    document.getElementById("objectifLeanMass").innerText = objectifLeanMass.toFixed(1);
+
+    function clamp(x) { return Math.max(0, Math.min(100, x)); }
+    function getData() { return JSON.parse(localStorage.getItem("balanceData")) || []; }
+
+    function calculateGlobalPercent(values) {
+      const leanMass = values.poids * (1 - values.graisse / 100);
+      let scoreLeanMass = clamp((leanMass / objectifLeanMass) * 100);
+      let scoreGraisse = clamp((objectifs.graisse / values.graisse) * 100);
+      let scoreViscerale = clamp((objectifs.viscerale / values.viscerale) * 100);
+      let scoreSousCutanee = clamp((objectifs.souscutanee / values.souscutanee) * 100);
+      let scoreEau = clamp((values.eau / objectifs.eau) * 100);
+      let scoreMuscle = clamp((values.muscle / objectifs.muscle) * 100);
+
+      let total =
+        (scoreLeanMass * weights.leanMass) +
+        (scoreGraisse * weights.graisse) +
+        (scoreViscerale * weights.viscerale) +
+        (scoreSousCutanee * weights.souscutanee) +
+        (scoreEau * weights.eau) +
+        (scoreMuscle * weights.muscle);
+
+      return { score: total.toFixed(1), leanMass: leanMass.toFixed(1) };
+    }
+
+    function saveData() {
+      const inputs = ['poids','graisse','souscutanee','viscerale','eau','muscle','os','bmr'];
+      const values = {};
+      for (let i of inputs) values[i] = parseFloat(document.getElementById(i).value);
+
+      if (Object.values(values).some(v => isNaN(v))) { alert("⚠️ Merci de remplir toutes les valeurs."); return; }
+
+      const date = new Date().toLocaleDateString("fr-FR");
+      const result = calculateGlobalPercent(values);
+
+      const entry = {...values, leanMass: result.leanMass, percent: result.score, date};
+      const data = getData();
+      data.push(entry);
+      localStorage.setItem("balanceData", JSON.stringify(data));
+
+      updateUI();
+      document.querySelectorAll("input").forEach(input => input.value = "");
+    }
+
+    function updateUI() {
+      const data = getData();
+      const table = document.getElementById("historyTable");
+      table.innerHTML = "";
+
+      data.forEach(entry => {
+        table.innerHTML += `<tr>
+          <td>${entry.date}</td>
+          <td>${entry.poids}</td>
+          <td>${entry.graisse}</td>
+          <td>${entry.souscutanee}</td>
+          <td>${entry.viscerale}</td>
+          <td>${entry.eau}</td>
+          <td>${entry.muscle}</td>
+          <td><b>${entry.leanMass}</b></td>
+          <td><b style="color:#00ff88">${entry.percent}%</b></td>
+        </tr>`;
+      });
+
+      if (data.length > 0) {
+        const last = data[data.length-1];
+        document.getElementById("progressGlobal").innerText = last.percent + "%";
+        document.getElementById("detailsBox").innerHTML = `
+          Lean Mass actuelle : <b>${last.leanMass}</b> kg / Objectif : <b>${objectifLeanMass.toFixed(1)}</b> kg <br>
+          Graisse actuelle : <b>${last.graisse}</b>% / Objectif : <b>${objectifs.graisse}</b>% <br>
+          Graisse viscérale : <b>${last.viscerale}</b> / Objectif : <b>${objectifs.viscerale}</b>
+        `;
+      } else document.getElementById("progressGlobal").innerText = "0%";
+
+      updateCharts(data);
+    }
+
+    function updateCharts(data) {
+      const labels = data.map(d => d.date);
+      const globalPercents = data.map(d => d.percent);
+
+      if (globalChart) globalChart.destroy();
+      if (statsChart) statsChart.destroy();
+
+      globalChart = new Chart(document.getElementById("globalChart"), {
+        type:"line", data:{labels,datasets:[{label:"% Score global musclé/sec",data:globalPercents,borderWidth:3,tension:0.3}]},
+        options:{responsive:true,scales:{y:{min:0,max:100}}}
+      });
+
+      statsChart = new Chart(document.getElementById("statsChart"), {
+        type:"line",
+        data:{
+          labels,
+          datasets:[
+            {label:"Poids", data:data.map(d=>d.poids), borderWidth:2, tension:0.3},
+            {label:"Graisse %", data:data.map(d=>d.graisse), borderWidth:2, tension:0.3},
+            {label:"Sous-cutanée %", data:data.map(d=>d.souscutanee), borderWidth:2, tension:0.3},
+            {label:"Viscérale", data:data.map(d=>d.viscerale), borderWidth:2, tension:0.3},
+            {label:"Eau %", data:data.map(d=>d.eau), borderWidth:2, tension:0.3},
+            {label:"Muscle %", data:data.map(d=>d.muscle), borderWidth:2, tension:0.3},
+            {label:"Lean Mass (kg)", data:data.map(d=>d.leanMass), borderWidth:2, tension:0.3}
+          ]
+        },
+        options:{responsive:true}
+      });
+    }
+
+    function resetData() { if(confirm("Tu es sûr de vouloir supprimer tout l'historique ?")) { localStorage.removeItem("balanceData"); updateUI(); } }
+
+    updateUI();
+  </script>
+</body>
+</html>

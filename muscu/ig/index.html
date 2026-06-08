@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page de Connexion</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column; /* Pour empiler les éléments verticalement */
+        }
+        .container {
+            background-color: #000;  /* Fond noir */
+            border: 2px solid #fff;  /* Bordure blanche */
+            border-radius: 10px;
+            padding: 30px;
+            width: 80%;  /* Réduire la largeur des boîtes à 80% de la largeur de la page */
+            max-width: 400px;
+            text-align: center;
+            margin: 0 10%; /* Marge à gauche et à droite pour réduire la largeur */
+        }
+        .logo {
+            width: 150px;
+            margin-bottom: 20px;
+        }
+        .input-wrapper {
+            display: flex;
+            flex-direction: column;  /* Empiler les inputs verticalement */
+            gap: 10px;  /* Espace entre les inputs */
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #3897f0;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #287ac1;
+        }
+        .footer-box {
+            background-color: #000;  /* Fond noir */
+            border: 2px solid #fff;  /* Bordure blanche */
+            border-radius: 10px;
+            padding: 20px;
+            width: 80%;  /* Réduire la largeur des boîtes à 80% de la largeur de la page */
+            max-width: 400px;
+            text-align: center;
+            margin: 20px 10%; /* Marge à gauche et à droite pour réduire la largeur */
+        }
+        .footer-box p {
+            color: #fff;
+            font-size: 14px;
+        }
+        .extra-text {
+            color: #fff;  /* Texte en blanc */
+            font-size: 12px;
+            margin-top: 20px;  /* Marge pour éloigner du reste du contenu */
+            text-align: center; /* Centré horizontalement */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/9/95/Instagram_logo_2022.svg" alt="Logo" class="logo">
+        
+        <!-- Wrapper pour les deux inputs empilés verticalement -->
+        <div class="input-wrapper">
+            <input type="text" placeholder="Numéro de téléphone, nom d'utilisateur ou e-mail">
+            <input type="password" placeholder="Mot de passe">
+        </div>
+        
+        <button>Se connecter</button>
+    </div>
+
+    <!-- Deuxième case en dehors de la première, mais centrée -->
+    <div class="footer-box">
+        <p>© 2024 Instagram</p>
+    </div>
+
+    <!-- Texte en dessous de la deuxième case -->
+    <p class="extra-text">Vous avez oublié votre mot de passe ?</p>
+
+</body>
+</html>
